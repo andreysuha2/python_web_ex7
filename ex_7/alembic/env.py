@@ -6,10 +6,12 @@ from sqlalchemy import pool
 from alembic import context
 
 from ex_7.models import Base
+from ex_7.definitions import DB_CONNECTION_STRING
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+config.set_section_option(config.config_ini_section, "DB_CONNECTION_STRING", DB_CONNECTION_STRING)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
