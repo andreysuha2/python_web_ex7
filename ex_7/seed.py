@@ -62,36 +62,37 @@ def generate_fake_data(count_students: int, count_groups: int, count_subjects: i
 def prepare_data(fake_students: list, fake_groups: list, fake_subjects: list, fake_teachers: list, fake_journal: list) -> tuple():
     groups = []
     for group in fake_groups:
-        groups.append({ "name": group })
+        groups.append(Group(code=group))
         
     studens = []
     for student in fake_students:
-        studens.append((student, randint(1, COUNT_GROUPS)))
+        studens.append(Student(name=student, group=groups[randint(0, COUNT_GROUPS - 1)]))
         
     teachers = []
     for teacher in fake_teachers:
-        teachers.append((teacher, ))
+        teachers.append(Teacher(name=teacher))
         
     subjects = []
     for subject in fake_subjects:
-        subjects.append((subject, randint(1, COUNT_TEACHERS)))
+        subjects.append(Subject(name=subject, teacher=teachers[randint(0, COUNT_TEACHERS - 1)]))
         
     marks_journal = []
     for index, marks in enumerate(fake_journal):
-        student_id = index + 1
+        student = studens[index]
         for mark in marks:
-            subject_id = randint(1, COUNT_SUBJECTS)
+            subject = subjects[randint(0, COUNT_SUBJECTS - 1)]
             month = randint(1, 12)
             day = randint(1, calendar.monthrange(2023, month)[1])
             mark_date = datetime(2023, month, day)
-            marks_journal.append((mark, student_id, subject_id, mark_date.date()))
+            marks_journal.append(Mark(mark=mark, student=student, subject=subject, date=mark_date.date()))
             
-    return groups, studens, teachers, subjects, marks_journal
+    return marks_journal
 
-def insert_data_to_db(groups: list, studets: list, teachers: list, subjects: list, marks: list) -> None:
-    pass
+def insert_data_to_db(marks: list) -> None:
+    session.add_all(marks)
+    session.commit()
 
 if __name__ == "__main__":
     fake_data = generate_fake_data(COUNT_STUDENTS, COUNT_GROUPS, COUNT_SUBJECTS, COUNT_TEACHERS, MAX_COUNT_POINTS)
     prepared_data = prepare_data(*fake_data)
-    insert_data_to_db(*prepared_data)
+    insert_data_to_db(prepared_data)
